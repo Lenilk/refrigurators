@@ -90,17 +90,30 @@ let App = () => {
   };
   const Update = async (id: React.Key) => {
     // ! เช็คให้สามาถอัปเดตโดยผ่านอันใดอันหนึ่งเพื่ออัพเดต กำหนดตัวแปรเพิ่มสร้างทางเลือกในการอัปเดต ระหว่างสิ่งที่พิมพ์กับสิ่งที่มีอยู่แล้ว
-    if (canSave) {
+    if (name != '' || comment != '' || amount != '') {
+      let Name =
+        name != ''
+          ? name
+          : index == indexList[1]
+          ? updateWantItem['name']
+          : updateRfItem['name'];
+      let Amount =
+        amount != ''
+          ? amount
+          : index == indexList[1]
+          ? updateWantItem['Amount']
+          : updateRfItem['Amount'];
+      let Comment = comment != '' ? comment : updateWantItem['Comment'];
       if (index == indexList[1]) {
         await axios
           .patch(`http://192.168.1.208:3000/updateWant/${id}`, {
-            name: name,
-            Amount: amount,
-            Comment: comment,
+            name: Name,
+            Amount: Amount,
+            Comment: Comment,
           })
-          .then(function (response) {
-            console.log(response);
-          })
+          // .then(function (response) {
+          //   console.log(response);
+          // })
           .catch(function (error) {
             setErrorText(error);
             console.log(error);
@@ -109,12 +122,12 @@ let App = () => {
       } else {
         await axios
           .patch(`http://192.168.1.208:3000/updateRf/${id}`, {
-            name: name,
-            Amount: amount,
+            name: Name,
+            Amount: Amount,
           })
-          .then(function (response) {
-            console.log(response);
-          })
+          // .then(function (response) {
+          //   console.log(response);
+          // })
           .catch(function (error) {
             setErrorText(error);
             console.log(error);
@@ -642,9 +655,9 @@ let App = () => {
                     console.log(errorText);
                     getRf();
                     getWant();
-                    if (canSave) {
+                    if (name != '' || comment != '' || amount != '') {
                       onClose();
-                      setOpenAdd(false);
+                      setOpenUpdate(false);
                     }
                   }
                 }}
@@ -656,6 +669,7 @@ let App = () => {
             style={{position: 'absolute', top: '2%', right: 15}}
             onPress={() => {
               setOpenUpdate(false);
+
               onClose();
               console.log(update);
             }}>
@@ -749,6 +763,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'white',
+    fontSize: 18,
   },
   MainVisible: {
     width: '100%',
