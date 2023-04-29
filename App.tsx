@@ -9,6 +9,7 @@ import {
   Alert,
   Pressable,
   TextInput,
+  FlatList,
 } from 'react-native';
 
 let App = () => {
@@ -20,8 +21,26 @@ let App = () => {
   let [amount, setAmount] = useState('');
   let [comment, setComment] = useState('');
   let canSave = name != '' && amount != '';
-  const getData = async () => {
-    let responseWant = axios
+  let [canNotSave, setCanNotSave] = useState(false);
+  let [errorText, setErrorText] = useState('');
+  let [rfItem, setRfItem] = useState(
+    Array<{name: String; Amount: String; _id: React.Key}>,
+  );
+  let [wantItem, setWantItem] = useState(
+    Array<{name: String; Amount: String; _id: React.Key; Comment: String}>,
+  );
+  let [loading, setLoading] = useState(true);
+  useEffect(() => {
+    getRf();
+    getWant();
+    setTimeout(() => {
+      getRf();
+      getWant();
+    }, 10000);
+  }, []);
+  const Delete = async () => {};
+  const getWant = async () => {
+    let responseWant: any = await axios
       .get('http://192.168.1.208:3000/getWant')
       // .then(function (response) {
       //   console.log(response.data);
@@ -30,7 +49,17 @@ let App = () => {
         // handle error
         console.log(error);
       });
-    let responseRf = axios
+    const data: {
+      name: String;
+      Amount: String;
+      _id: React.Key;
+      Comment: String;
+    }[] = responseWant.data;
+    setWantItem(data);
+    setLoading(false);
+  };
+  const getRf = async () => {
+    let responseRf: any = await axios
       .get('http://192.168.1.208:3000/getRf')
       // .then(function (response) {
       //   console.log(response.data);
@@ -39,6 +68,10 @@ let App = () => {
         // handle error
         console.log(error);
       });
+    const data: Array<{name: String; Amount: String; _id: React.Key}> =
+      responseRf.data;
+    setRfItem(data);
+    setLoading(false);
   };
   const add = async () => {
     if (canSave) {
@@ -49,10 +82,11 @@ let App = () => {
             Amount: amount,
             Comment: comment,
           })
-          // .then(function (response) {
-          //   console.log(response);
-          // })
+          .then(function (response) {
+            console.log(response);
+          })
           .catch(function (error) {
+            setErrorText(error);
             console.log(error);
           });
       } else {
@@ -61,13 +95,15 @@ let App = () => {
             name: name,
             Amount: amount,
           })
-          // .then(function (response) {
-          //   console.log(response);
-          // })
+          .then(response => {
+            console.log(response);
+          })
           .catch(function (error) {
+            setErrorText(error);
             console.log(error);
           });
       }
+      setCanNotSave(false);
     }
   };
   function onClose() {
@@ -78,6 +114,12 @@ let App = () => {
     } else {
       setAmount('');
       setName('');
+    }
+    setCanNotSave(false);
+  }
+  function checkBeforeAdd() {
+    if (!canSave) {
+      setCanNotSave(true);
     }
   }
   return (
@@ -119,104 +161,115 @@ let App = () => {
           flex: 8.6,
           width: '100%',
         }}>
-        <View
-          style={
-            index == 'Refrigurator' ? styles.MainVisible : styles.MainUnvisible
-          }>
-          <ScrollView>
+        {loading ? (
+          <View
+            style={{
+              width: '100%',
+              height: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text style={{fontSize: 40, color: 'rgb(56, 167, 241)'}}>
+              Loading...
+            </Text>
+          </View>
+        ) : (
+          <>
             <View
-              style={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                flexWrap: 'wrap',
-              }}>
-              <Pressable
-                style={{
-                  width: '45%',
-                  height: 'auto',
-                  minHeight: 70,
-                  backgroundColor: 'rgb(56, 167, 241)',
-                  margin: '2.5%',
-                  justifyContent: 'space-evenly',
-                  alignItems: 'center',
-                  borderRadius: 10,
-                  padding: 10,
-                }}>
-                <Text style={styles.text}>เนื้อหมู</Text>
-                <Text style={styles.text}>จำนวน 6 กิโลกรัม</Text>
-              </Pressable>
+              style={
+                index == 'Refrigurator'
+                  ? styles.MainVisible
+                  : styles.MainUnvisible
+              }>
+              <FlatList
+                numColumns={2}
+                contentContainerStyle={{
+                  width: '100%',
+                  height: '100%',
+                }}
+                data={rfItem}
+                renderItem={({item}) => (
+                  <View
+                    style={{
+                      width: '45%',
+                      height: 100,
+                      backgroundColor: 'rgb(56, 167, 241)',
+                      margin: '2.5%',
+                      justifyContent: 'space-evenly',
+                      alignItems: 'center',
+                      borderRadius: 10,
+                      padding: 10,
+                    }}>
+                    <Text style={styles.text}>{item['name']}</Text>
+                    <Text style={styles.text}>จำนวน {item['Amount']}</Text>
+                  </View>
+                )}
+              />
             </View>
-          </ScrollView>
-        </View>
 
-        {/* 
-        Second Page
-         */}
-        <View
-          style={index == 'Want' ? styles.MainVisible : styles.MainUnvisible}>
-          <ScrollView>
             <View
-              style={{
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                flexWrap: 'wrap',
-              }}>
-              <View
-                style={{
-                  width: '95%',
-                  minHeight: 90,
-                  backgroundColor: 'rgb(66, 165, 245)',
-                  margin: '2.5%',
-                  padding: 10,
-                  borderRadius: 10,
-                  justifyContent: 'space-evenly',
-                  alignItems: 'center',
-                }}>
-                <Text style={styles.text}>ต้องการซื้อ ปลา</Text>
-                <Text style={styles.text}>จำนวน 2 กิโลกรัม</Text>
-                <Text style={styles.text}>หมายเหตุ ซื้อให้แมว</Text>
-              </View>
+              style={
+                index == 'Want' ? styles.MainVisible : styles.MainUnvisible
+              }>
+              <FlatList
+                data={wantItem}
+                contentContainerStyle={{
+                  width: '100%',
+                  height: '100%',
+                }}
+                renderItem={({item}) => (
+                  <Pressable
+                    style={{
+                      width: '95%',
+                      minHeight: 90,
+                      backgroundColor: 'rgb(66, 165, 245)',
+                      margin: '2.5%',
+                      padding: 10,
+                      borderRadius: 10,
+                      justifyContent: 'space-evenly',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={styles.text}>ต้องการซื้อ {item['name']}</Text>
+                    <Text style={styles.text}>จำนวน {item['Amount']}</Text>
+                    <Text style={styles.text}>หมายเหตุ {item['Comment']}</Text>
+                  </Pressable>
+                )}
+              />
             </View>
-          </ScrollView>
-        </View>
 
-        {/* 
+            {/* 
         
         floating action button
         */}
-        <Pressable
-          style={{
-            width: 65,
-            height: 65,
-            position: 'absolute',
-            backgroundColor: 'rgb(66, 165, 245)',
-            bottom: '3%',
-            right: '3%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 50,
-            borderColor: 'black',
-            borderWidth: 1,
-          }}
-          onPress={() => {
-            setOpenAdd(true);
-            getData();
-          }}>
-          <Text
-            style={{
-              color: 'white',
-              fontSize: 30,
-              fontWeight: 'bold',
-            }}>
-            +
-          </Text>
-        </Pressable>
+            <Pressable
+              style={{
+                width: 65,
+                height: 65,
+                position: 'absolute',
+                backgroundColor: 'rgb(66, 165, 245)',
+                bottom: '3%',
+                right: '3%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 50,
+                borderColor: 'black',
+                borderWidth: 1,
+              }}
+              onPress={() => {
+                setOpenAdd(true);
+                console.log(rfItem);
+              }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 30,
+                  fontWeight: 'bold',
+                }}>
+                +
+              </Text>
+            </Pressable>
+          </>
+        )}
       </View>
 
       {/* Add Page */}
@@ -226,7 +279,8 @@ let App = () => {
             width: '80%',
             maxWidth: 300,
             height: 'auto',
-            maxHeight: 250,
+            minHeight: 250,
+            maxHeight: 290,
             backgroundColor: 'white',
             position: 'relative',
             justifyContent: 'center',
@@ -279,11 +333,31 @@ let App = () => {
               ) : (
                 <></>
               )}
+              {canNotSave ? (
+                <Text style={{color: 'red'}}>
+                  * กรอกข้อมูลสิ่งที่ต้องการซื้อและจำนวน
+                </Text>
+              ) : (
+                <></>
+              )}
               <Button
                 title="เพิ่ม"
-                onPress={() => {
-                  add();
-                  onClose();
+                onPress={async () => {
+                  await add();
+                  checkBeforeAdd();
+                  console.log(`error:${errorText}`);
+                  if (await errorText) {
+                    Alert.alert(errorText);
+                    console.log(errorText);
+                  } else {
+                    console.log(errorText);
+                    getRf();
+                    getWant();
+                    if (canSave) {
+                      onClose();
+                      setOpenAdd(false);
+                    }
+                  }
                 }}
               />
             </View>
@@ -393,7 +467,6 @@ const styles = StyleSheet.create({
   MainUnvisible: {
     display: 'none',
     width: '100%',
-    height: '100%',
   },
   textInput: {
     borderWidth: 1,
