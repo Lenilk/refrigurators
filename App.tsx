@@ -23,22 +23,106 @@ let App = () => {
   let canSave = name != '' && amount != '';
   let [canNotSave, setCanNotSave] = useState(false);
   let [errorText, setErrorText] = useState('');
+  let [update, setUpdate] = useState(0);
   let [rfItem, setRfItem] = useState(
     Array<{name: String; Amount: String; _id: React.Key}>,
   );
   let [wantItem, setWantItem] = useState(
     Array<{name: String; Amount: String; _id: React.Key; Comment: String}>,
   );
+
+  let [openDelete, setOpenDelete] = useState(false);
+  let [openUpdate, setOpenUpdate] = useState(false);
+  let [deleteWantItem, setDeleteWantItem] = useState<{
+    name: String;
+    Amount: String;
+    _id: React.Key;
+    Comment: String;
+  }>({name: '', Amount: '', _id: '', Comment: ''});
+  let [updateWantItem, setUpdateWantItem] = useState<{
+    name: String;
+    Amount: String;
+    _id: React.Key;
+    Comment: String;
+  }>({name: '', Amount: '', _id: '', Comment: ''});
   let [loading, setLoading] = useState(true);
+  let [deleteRfItem, setDeleteRfItem] = useState<{
+    name: String;
+    Amount: String;
+    _id: React.Key;
+  }>({name: '', Amount: '', _id: ''});
+  let [updateRfItem, setUpdateRfItem] = useState<{
+    name: String;
+    Amount: String;
+    _id: React.Key;
+  }>({name: '', Amount: '', _id: ''});
   useEffect(() => {
     getRf();
     getWant();
     setTimeout(() => {
-      getRf();
-      getWant();
+      setUpdate(update + 1);
     }, 10000);
-  }, []);
-  const Delete = async () => {};
+  }, [update]);
+  const Delete = async (id: React.Key) => {
+    if (index == indexList[1]) {
+      await axios
+        .delete(`http://192.168.1.208:3000/deleteWant/${id}`)
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          setErrorText(error);
+          console.log(error);
+        });
+      getWant();
+    } else {
+      await axios
+        .delete(`http://192.168.1.208:3000/deleteRf/${id}`)
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          setErrorText(error);
+          console.log(error);
+        });
+      getRf();
+    }
+  };
+  const Update = async (id: React.Key) => {
+    // ! เช็คให้สามาถอัปเดตโดยผ่านอันใดอันหนึ่งเพื่ออัพเดต กำหนดตัวแปรเพิ่มสร้างทางเลือกในการอัปเดต ระหว่างสิ่งที่พิมพ์กับสิ่งที่มีอยู่แล้ว
+    if (canSave) {
+      if (index == indexList[1]) {
+        await axios
+          .patch(`http://192.168.1.208:3000/updateWant/${id}`, {
+            name: name,
+            Amount: amount,
+            Comment: comment,
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            setErrorText(error);
+            console.log(error);
+          });
+        getWant();
+      } else {
+        await axios
+          .patch(`http://192.168.1.208:3000/updateRf/${id}`, {
+            name: name,
+            Amount: amount,
+          })
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            setErrorText(error);
+            console.log(error);
+          });
+        getRf();
+      }
+    }
+  };
   const getWant = async () => {
     let responseWant: any = await axios
       .get('http://192.168.1.208:3000/getWant')
@@ -153,9 +237,6 @@ let App = () => {
         */}
       </View>
 
-      {/* 
-      First Page
-      */}
       <View
         style={{
           flex: 8.6,
@@ -175,6 +256,9 @@ let App = () => {
           </View>
         ) : (
           <>
+            {/* 
+      First Page
+      */}
             <View
               style={
                 index == 'Refrigurator'
@@ -189,7 +273,15 @@ let App = () => {
                 }}
                 data={rfItem}
                 renderItem={({item}) => (
-                  <View
+                  <Pressable
+                    onPress={() => {
+                      setUpdateRfItem(item);
+                      setOpenUpdate(true);
+                    }}
+                    onLongPress={() => {
+                      setDeleteRfItem(item);
+                      setOpenDelete(true);
+                    }}
                     style={{
                       width: '45%',
                       height: 100,
@@ -202,11 +294,13 @@ let App = () => {
                     }}>
                     <Text style={styles.text}>{item['name']}</Text>
                     <Text style={styles.text}>จำนวน {item['Amount']}</Text>
-                  </View>
+                  </Pressable>
                 )}
               />
             </View>
-
+            {/* 
+      Second Page
+      */}
             <View
               style={
                 index == 'Want' ? styles.MainVisible : styles.MainUnvisible
@@ -217,23 +311,42 @@ let App = () => {
                   width: '100%',
                   height: '100%',
                 }}
-                renderItem={({item}) => (
-                  <Pressable
-                    style={{
-                      width: '95%',
-                      minHeight: 90,
-                      backgroundColor: 'rgb(66, 165, 245)',
-                      margin: '2.5%',
-                      padding: 10,
-                      borderRadius: 10,
-                      justifyContent: 'space-evenly',
-                      alignItems: 'center',
-                    }}>
-                    <Text style={styles.text}>ต้องการซื้อ {item['name']}</Text>
-                    <Text style={styles.text}>จำนวน {item['Amount']}</Text>
-                    <Text style={styles.text}>หมายเหตุ {item['Comment']}</Text>
-                  </Pressable>
-                )}
+                renderItem={({item}) => {
+                  return (
+                    <Pressable
+                      onPress={() => {
+                        setOpenUpdate(true);
+                        setUpdateWantItem(item);
+                      }}
+                      onLongPress={() => {
+                        setDeleteWantItem(item);
+                        setOpenDelete(true);
+                      }}
+                      style={{
+                        width: '95%',
+                        minHeight: 90,
+                        backgroundColor: 'rgb(66, 165, 245)',
+                        margin: '2.5%',
+                        padding: 10,
+                        borderRadius: 10,
+                        justifyContent: 'space-evenly',
+                        alignItems: 'center',
+                        position: 'relative',
+                      }}>
+                      <Text style={styles.text}>
+                        ต้องการซื้อ {item['name']}
+                      </Text>
+                      <Text style={styles.text}>จำนวน {item['Amount']}</Text>
+                      {item['Comment'] == '' ? (
+                        <></>
+                      ) : (
+                        <Text style={styles.text}>
+                          หมายเหตุ {item['Comment']}
+                        </Text>
+                      )}
+                    </Pressable>
+                  );
+                }}
               />
             </View>
 
@@ -368,6 +481,183 @@ let App = () => {
             onPress={() => {
               setOpenAdd(false);
               onClose();
+              console.log(update);
+            }}>
+            <Text style={{color: 'black', fontSize: 20, fontWeight: 'bold'}}>
+              X
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* Delete item page */}
+      <View style={openDelete ? styles.Add : styles.addUnvisible}>
+        <View
+          style={{
+            width: '80%',
+            maxWidth: 300,
+            height: 'auto',
+            minHeight: 200,
+            maxHeight: 200,
+            backgroundColor: 'white',
+            position: 'relative',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 10,
+          }}>
+          <View
+            style={{
+              margin: '5%',
+              width: '90%',
+              height: '90%',
+              alignItems: 'center',
+              padding: '5%',
+              justifyContent: 'space-evenly',
+            }}>
+            <Text style={{color: 'rgb(66, 165, 245)', fontSize: 25}}>
+              ต้องการลบหรือไม่
+            </Text>
+            <Text>
+              {index == indexList[1]
+                ? deleteWantItem['name']
+                : deleteRfItem['name']}
+            </Text>
+            <Button
+              title="ลบ"
+              onPress={() => {
+                if (index == indexList[1]) {
+                  Delete(deleteWantItem['_id']);
+                  getWant();
+                } else {
+                  Delete(deleteRfItem['_id']);
+                  getRf();
+                }
+
+                setOpenDelete(false);
+              }}></Button>
+          </View>
+          <Pressable
+            style={{position: 'absolute', top: '2%', right: 15}}
+            onPress={() => {
+              setOpenDelete(false);
+            }}>
+            <Text style={{color: 'black', fontSize: 20, fontWeight: 'bold'}}>
+              X
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+      {/* Update Item Page */}
+      <View style={openUpdate ? styles.Add : styles.addUnvisible}>
+        <View
+          style={{
+            width: '80%',
+            maxWidth: 300,
+            height: 'auto',
+            minHeight: 250,
+            maxHeight: 300,
+            backgroundColor: 'white',
+            position: 'relative',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 10,
+          }}>
+          <View
+            style={{
+              margin: '5%',
+              width: '90%',
+              height: '90%',
+              alignItems: 'center',
+              padding: '5%',
+            }}>
+            <Text style={{color: 'rgb(66, 165, 245)', fontSize: 25}}>
+              แก้ไขข้อมูล
+            </Text>
+            <View
+              style={{
+                height: '90%',
+                width: '100%',
+                justifyContent: 'space-around',
+                alignItems: 'center',
+              }}>
+              <Text>
+                {index == indexList[1]
+                  ? updateWantItem['name']
+                  : updateRfItem['name']}
+              </Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder={
+                  index == 'Want'
+                    ? 'สิ่งที่ต้องการซ์้อ'
+                    : 'สิ่งที่มีอยู่แล้วในตู้เย็น'
+                }
+                value={name}
+                onChangeText={setName}
+              />
+              <Text>
+                {index == indexList[1]
+                  ? updateWantItem['Amount']
+                  : updateRfItem['Amount']}
+              </Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="จำนวน"
+                value={amount}
+                onChangeText={setAmount}
+              />
+              {index == indexList[1] ? (
+                <>
+                  <Text>{updateWantItem['Comment']}</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="หมายเหตุ"
+                    value={comment}
+                    onChangeText={setComment}
+                  />
+                </>
+              ) : (
+                <></>
+              )}
+              {canNotSave ? (
+                <Text style={{color: 'red'}}>
+                  * กรอกข้อมูลสิ่งที่ต้องการซื้อและจำนวน
+                </Text>
+              ) : (
+                <></>
+              )}
+              <Button
+                title="แก้ไข"
+                onPress={async () => {
+                  await Update(
+                    index == indexList[1]
+                      ? updateWantItem['_id']
+                      : updateRfItem['_id'],
+                  );
+                  console.log(`error:${errorText}`);
+                  if (await errorText) {
+                    Alert.alert(errorText);
+                    console.log(errorText);
+                  } else {
+                    console.log(errorText);
+                    getRf();
+                    getWant();
+                    if (canSave) {
+                      onClose();
+                      setOpenAdd(false);
+                    }
+                  }
+                }}
+              />
+            </View>
+          </View>
+
+          <Pressable
+            style={{position: 'absolute', top: '2%', right: 15}}
+            onPress={() => {
+              setOpenUpdate(false);
+              onClose();
+              console.log(update);
             }}>
             <Text style={{color: 'black', fontSize: 20, fontWeight: 'bold'}}>
               X
