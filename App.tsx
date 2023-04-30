@@ -11,11 +11,12 @@ import {
   TextInput,
   FlatList,
 } from 'react-native';
-
+import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 let App = () => {
   let [openAdd, setOpenAdd] = useState(false);
   let [selectIndex, setSelectIndex] = useState(0);
-  let indexList = ['Refrigurator', 'Want'];
+  let indexList = ['ในตู้เย็น', 'รายการสั่งซื้อ'];
   let index = indexList[selectIndex];
   let [name, setName] = useState('');
   let [amount, setAmount] = useState('');
@@ -27,7 +28,13 @@ let App = () => {
   let [rfItem, setRfItem] = useState(
     Array<{name: String; Amount: String; _id: React.Key}>,
   );
+  let [oldRfItem, setOldRfItem] = useState(
+    Array<{name: String; Amount: String; _id: React.Key}>,
+  );
   let [wantItem, setWantItem] = useState(
+    Array<{name: String; Amount: String; _id: React.Key; Comment: String}>,
+  );
+  let [oldWantItem, setOldWantItem] = useState(
     Array<{name: String; Amount: String; _id: React.Key; Comment: String}>,
   );
 
@@ -56,17 +63,78 @@ let App = () => {
     Amount: String;
     _id: React.Key;
   }>({name: '', Amount: '', _id: ''});
+  let [isConnect, setIsConnect] = useState(false);
   useEffect(() => {
-    getRf();
-    getWant();
+    checkNet();
+    if (isConnect) {
+      getRf();
+      getWant();
+      storeData(rfItem, indexList[0]);
+      storeData(wantItem, indexList[1]);
+    } else {
+      getData();
+    }
+
     setTimeout(() => {
       setUpdate(update + 1);
-    }, 10000);
+    }, 5000);
+    console.log(update);
   }, [update]);
+  const storeData = async (value: any, type: String) => {
+    try {
+      if (
+        JSON.stringify(value) !=
+        (type == indexList[0]
+          ? JSON.stringify(oldRfItem)
+          : JSON.stringify(oldWantItem))
+      ) {
+        if (type == indexList[0]) {
+          const jsonValue = JSON.stringify(value);
+          setOldRfItem(value);
+          await AsyncStorage.setItem('rfData', jsonValue);
+        } else {
+          const jsonValue = JSON.stringify(value);
+          setOldWantItem(value);
+          await AsyncStorage.setItem('wantData', jsonValue);
+        }
+        console.log('finish saving');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const getData = async () => {
+    try {
+      const rfValue = await AsyncStorage.getItem('rfData');
+      const wantValue = await AsyncStorage.getItem('wantData');
+      let rfItems = rfValue != null ? JSON.parse(rfValue) : null;
+      let wantItems = wantValue != null ? JSON.parse(wantValue) : null;
+      if (wantItems != null) {
+        setOldWantItem(wantItems);
+        setWantItem(wantItems);
+      }
+      if (rfItems != null) {
+        setOldRfItem(rfItems);
+        setRfItem(rfItems);
+      }
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const checkNet = () =>
+    NetInfo.addEventListener(state => {
+      setIsConnect(state.isConnected || false);
+      console.log(state.isConnected);
+    });
+
   const Delete = async (id: React.Key) => {
     if (index == indexList[1]) {
       await axios
-        .delete(`http://192.168.1.208:3000/deleteWant/${id}`)
+        .delete(
+          `https://refrigurator-oexhc495r-lenilk.vercel.app/deleteWant/${id}`,
+        )
         .then(function (response) {
           console.log(response);
         })
@@ -77,7 +145,9 @@ let App = () => {
       getWant();
     } else {
       await axios
-        .delete(`http://192.168.1.208:3000/deleteRf/${id}`)
+        .delete(
+          `https://refrigurator-oexhc495r-lenilk.vercel.app/deleteRf/${id}`,
+        )
         .then(function (response) {
           console.log(response);
         })
@@ -106,11 +176,14 @@ let App = () => {
       let Comment = comment != '' ? comment : updateWantItem['Comment'];
       if (index == indexList[1]) {
         await axios
-          .patch(`http://192.168.1.208:3000/updateWant/${id}`, {
-            name: Name,
-            Amount: Amount,
-            Comment: Comment,
-          })
+          .patch(
+            `https://refrigurator-oexhc495r-lenilk.vercel.app/updateWant/${id}`,
+            {
+              name: Name,
+              Amount: Amount,
+              Comment: Comment,
+            },
+          )
           // .then(function (response) {
           //   console.log(response);
           // })
@@ -121,10 +194,13 @@ let App = () => {
         getWant();
       } else {
         await axios
-          .patch(`http://192.168.1.208:3000/updateRf/${id}`, {
-            name: Name,
-            Amount: Amount,
-          })
+          .patch(
+            `https://refrigurator-oexhc495r-lenilk.vercel.app/updateRf/${id}`,
+            {
+              name: Name,
+              Amount: Amount,
+            },
+          )
           // .then(function (response) {
           //   console.log(response);
           // })
@@ -138,7 +214,7 @@ let App = () => {
   };
   const getWant = async () => {
     let responseWant: any = await axios
-      .get('http://192.168.1.208:3000/getWant')
+      .get('https://refrigurator-oexhc495r-lenilk.vercel.app/getWant')
       // .then(function (response) {
       //   console.log(response.data);
       // })
@@ -152,12 +228,15 @@ let App = () => {
       _id: React.Key;
       Comment: String;
     }[] = responseWant.data;
-    setWantItem(data);
+    if (JSON.stringify(data) != JSON.stringify(wantItem)) {
+      setWantItem(data);
+    }
+
     setLoading(false);
   };
   const getRf = async () => {
     let responseRf: any = await axios
-      .get('http://192.168.1.208:3000/getRf')
+      .get('https://refrigurator-oexhc495r-lenilk.vercel.app/getRf')
       // .then(function (response) {
       //   console.log(response.data);
       // })
@@ -167,14 +246,17 @@ let App = () => {
       });
     const data: Array<{name: String; Amount: String; _id: React.Key}> =
       responseRf.data;
-    setRfItem(data);
+    if (JSON.stringify(data) != JSON.stringify(rfItem)) {
+      setRfItem(data);
+    }
+
     setLoading(false);
   };
   const add = async () => {
     if (canSave) {
       if (index == indexList[1]) {
         await axios
-          .post('http://192.168.1.208:3000/postWant', {
+          .post('https://refrigurator-oexhc495r-lenilk.vercel.app/postWant', {
             name: name,
             Amount: amount,
             Comment: comment,
@@ -188,7 +270,7 @@ let App = () => {
           });
       } else {
         await axios
-          .post('http://192.168.1.208:3000/postRf', {
+          .post('https://refrigurator-oexhc495r-lenilk.vercel.app/postRf', {
             name: name,
             Amount: amount,
           })
@@ -274,7 +356,7 @@ let App = () => {
       */}
             <View
               style={
-                index == 'Refrigurator'
+                index == indexList[0]
                   ? styles.MainVisible
                   : styles.MainUnvisible
               }>
@@ -288,12 +370,16 @@ let App = () => {
                 renderItem={({item}) => (
                   <Pressable
                     onPress={() => {
-                      setUpdateRfItem(item);
-                      setOpenUpdate(true);
+                      if (isConnect) {
+                        setUpdateRfItem(item);
+                        setOpenUpdate(true);
+                      }
                     }}
                     onLongPress={() => {
-                      setDeleteRfItem(item);
-                      setOpenDelete(true);
+                      if (isConnect) {
+                        setDeleteRfItem(item);
+                        setOpenDelete(true);
+                      }
                     }}
                     style={{
                       width: '45%',
@@ -316,7 +402,9 @@ let App = () => {
       */}
             <View
               style={
-                index == 'Want' ? styles.MainVisible : styles.MainUnvisible
+                index == indexList[1]
+                  ? styles.MainVisible
+                  : styles.MainUnvisible
               }>
               <FlatList
                 data={wantItem}
@@ -328,12 +416,16 @@ let App = () => {
                   return (
                     <Pressable
                       onPress={() => {
-                        setOpenUpdate(true);
-                        setUpdateWantItem(item);
+                        if (isConnect) {
+                          setUpdateWantItem(item);
+                          setOpenUpdate(true);
+                        }
                       }}
                       onLongPress={() => {
-                        setDeleteWantItem(item);
-                        setOpenDelete(true);
+                        if (isConnect) {
+                          setDeleteWantItem(item);
+                          setOpenDelete(true);
+                        }
                       }}
                       style={{
                         width: '95%',
@@ -367,33 +459,38 @@ let App = () => {
         
         floating action button
         */}
-            <Pressable
-              style={{
-                width: 65,
-                height: 65,
-                position: 'absolute',
-                backgroundColor: 'rgb(66, 165, 245)',
-                bottom: '3%',
-                right: '3%',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 50,
-                borderColor: 'black',
-                borderWidth: 1,
-              }}
-              onPress={() => {
-                setOpenAdd(true);
-                console.log(rfItem);
-              }}>
-              <Text
+            {isConnect ? (
+              <Pressable
                 style={{
-                  color: 'white',
-                  fontSize: 30,
-                  fontWeight: 'bold',
+                  width: 65,
+                  height: 65,
+                  position: 'absolute',
+                  backgroundColor: 'rgb(66, 165, 245)',
+                  bottom: '3%',
+                  right: '3%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 50,
+                  borderColor: 'black',
+                  borderWidth: 1,
+                }}
+                onPress={() => {
+                  if (isConnect) {
+                    setOpenAdd(true);
+                  }
                 }}>
-                +
-              </Text>
-            </Pressable>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontSize: 30,
+                    fontWeight: 'bold',
+                  }}>
+                  +
+                </Text>
+              </Pressable>
+            ) : (
+              <></>
+            )}
           </>
         )}
       </View>
@@ -422,9 +519,7 @@ let App = () => {
               padding: '5%',
             }}>
             <Text style={{color: 'rgb(66, 165, 245)', fontSize: 25}}>
-              {index == indexList[1]
-                ? 'เพิ่มสิ่งที่ต้องการซื้อ'
-                : 'เพิ่มสิ่งที่มีอยู่ในตู้เย็น'}
+              {index == indexList[1] ? 'เพิ่มรายการ' : 'เพิ่มในตู้เย็น'}
             </Text>
             <View
               style={{
@@ -436,7 +531,7 @@ let App = () => {
               <TextInput
                 style={styles.textInput}
                 placeholder={
-                  index == 'Want'
+                  index == indexList[1]
                     ? 'สิ่งที่ต้องการซ์้อ'
                     : 'สิ่งที่มีอยู่แล้วในตู้เย็น'
                 }
@@ -469,20 +564,19 @@ let App = () => {
               <Button
                 title="เพิ่ม"
                 onPress={async () => {
-                  await add();
-                  checkBeforeAdd();
-                  console.log(`error:${errorText}`);
-                  if (await errorText) {
-                    Alert.alert(errorText);
-                    console.log(errorText);
-                  } else {
-                    console.log(errorText);
+                  if (isConnect) {
+                    await add();
+                    checkBeforeAdd();
                     getRf();
                     getWant();
                     if (canSave) {
                       onClose();
                       setOpenAdd(false);
                     }
+                  } else {
+                    Alert.alert('Internet not connect');
+                    onClose();
+                    setOpenAdd(false);
                   }
                 }}
               />
@@ -538,15 +632,21 @@ let App = () => {
             <Button
               title="ลบ"
               onPress={() => {
-                if (index == indexList[1]) {
-                  Delete(deleteWantItem['_id']);
-                  getWant();
+                if (isConnect) {
+                  if (index == indexList[1]) {
+                    Delete(deleteWantItem['_id']);
+                    getWant();
+                    storeData(wantItem, indexList[1]);
+                  } else {
+                    Delete(deleteRfItem['_id']);
+                    getRf();
+                    storeData(rfItem, indexList[0]);
+                  }
+                  setOpenDelete(false);
                 } else {
-                  Delete(deleteRfItem['_id']);
-                  getRf();
+                  Alert.alert('Internet not Connnect');
+                  setOpenDelete(false);
                 }
-
-                setOpenDelete(false);
               }}></Button>
           </View>
           <Pressable
@@ -601,7 +701,7 @@ let App = () => {
               <TextInput
                 style={styles.textInput}
                 placeholder={
-                  index == 'Want'
+                  index == indexList[1]
                     ? 'สิ่งที่ต้องการซ์้อ'
                     : 'สิ่งที่มีอยู่แล้วในตู้เย็น'
                 }
@@ -642,23 +742,23 @@ let App = () => {
               <Button
                 title="แก้ไข"
                 onPress={async () => {
-                  await Update(
-                    index == indexList[1]
-                      ? updateWantItem['_id']
-                      : updateRfItem['_id'],
-                  );
-                  console.log(`error:${errorText}`);
-                  if (await errorText) {
-                    Alert.alert(errorText);
-                    console.log(errorText);
-                  } else {
-                    console.log(errorText);
+                  if (isConnect) {
+                    await Update(
+                      index == indexList[1]
+                        ? updateWantItem['_id']
+                        : updateRfItem['_id'],
+                    );
                     getRf();
                     getWant();
+                    storeData(rfItem, indexList[0]);
+                    storeData(wantItem, indexList[1]);
                     if (name != '' || comment != '' || amount != '') {
                       onClose();
                       setOpenUpdate(false);
                     }
+                  } else {
+                    Alert.alert('Internet not Connnect');
+                    setOpenUpdate(false);
                   }
                 }}
               />
