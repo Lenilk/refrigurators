@@ -362,10 +362,6 @@ let App = () => {
               }>
               <FlatList
                 numColumns={2}
-                contentContainerStyle={{
-                  width: '100%',
-                  height: '100%',
-                }}
                 data={rfItem}
                 renderItem={({item}) => (
                   <Pressable
@@ -408,10 +404,6 @@ let App = () => {
               }>
               <FlatList
                 data={wantItem}
-                contentContainerStyle={{
-                  width: '100%',
-                  height: '100%',
-                }}
                 renderItem={({item}) => {
                   return (
                     <Pressable
