@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -26,16 +26,16 @@ let App = () => {
   let [errorText, setErrorText] = useState('');
   let [update, setUpdate] = useState(0);
   let [rfItem, setRfItem] = useState(
-    Array<{name: String; Amount: String; _id: React.Key}>,
+    Array<{ name: String; Amount: String; _id: React.Key }>,
   );
   let [oldRfItem, setOldRfItem] = useState(
-    Array<{name: String; Amount: String; _id: React.Key}>,
+    Array<{ name: String; Amount: String; _id: React.Key }>,
   );
   let [wantItem, setWantItem] = useState(
-    Array<{name: String; Amount: String; _id: React.Key; Comment: String}>,
+    Array<{ name: String; Amount: String; _id: React.Key; Comment: String }>,
   );
   let [oldWantItem, setOldWantItem] = useState(
-    Array<{name: String; Amount: String; _id: React.Key; Comment: String}>,
+    Array<{ name: String; Amount: String; _id: React.Key; Comment: String }>,
   );
 
   let [openDelete, setOpenDelete] = useState(false);
@@ -45,24 +45,24 @@ let App = () => {
     Amount: String;
     _id: React.Key;
     Comment: String;
-  }>({name: '', Amount: '', _id: '', Comment: ''});
+  }>({ name: '', Amount: '', _id: '', Comment: '' });
   let [updateWantItem, setUpdateWantItem] = useState<{
     name: String;
     Amount: String;
     _id: React.Key;
     Comment: String;
-  }>({name: '', Amount: '', _id: '', Comment: ''});
+  }>({ name: '', Amount: '', _id: '', Comment: '' });
   let [loading, setLoading] = useState(true);
   let [deleteRfItem, setDeleteRfItem] = useState<{
     name: String;
     Amount: String;
     _id: React.Key;
-  }>({name: '', Amount: '', _id: ''});
+  }>({ name: '', Amount: '', _id: '' });
   let [updateRfItem, setUpdateRfItem] = useState<{
     name: String;
     Amount: String;
     _id: React.Key;
-  }>({name: '', Amount: '', _id: ''});
+  }>({ name: '', Amount: '', _id: '' });
   let [isConnect, setIsConnect] = useState(false);
   useEffect(() => {
     checkNet();
@@ -165,15 +165,15 @@ let App = () => {
         name != ''
           ? name
           : index == indexList[1]
-          ? updateWantItem['name']
-          : updateRfItem['name'];
+            ? updateWantItem['name']
+            : updateRfItem['name'];
       let Amount =
         amount != ''
           ? amount
           : index == indexList[1]
-          ? updateWantItem['Amount']
-          : updateRfItem['Amount'];
-      let Comment = comment != '' ? comment : updateWantItem['Comment'];
+            ? updateWantItem['Amount']
+            : updateRfItem['Amount'];
+      let Comment = comment;
       if (index == indexList[1]) {
         await axios
           .patch(
@@ -244,7 +244,7 @@ let App = () => {
         // handle error
         console.log(error);
       });
-    const data: Array<{name: String; Amount: String; _id: React.Key}> =
+    const data: Array<{ name: String; Amount: String; _id: React.Key }> =
       responseRf.data;
     if (JSON.stringify(data) != JSON.stringify(rfItem)) {
       setRfItem(data);
@@ -302,7 +302,7 @@ let App = () => {
     }
   }
   return (
-    <View style={{height: '100%', width: '100%'}}>
+    <View style={{ height: '100%', width: '100%' }}>
       {/* 
 
       Title bar 
@@ -321,7 +321,7 @@ let App = () => {
             alignItems: 'center',
             backgroundColor: 'rgb(229, 115, 115)',
           }}>
-          <Text style={{color: 'white', fontWeight: 'bold', fontSize: 20}}>
+          <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20 }}>
             {index}
           </Text>
         </View>
@@ -345,7 +345,7 @@ let App = () => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Text style={{fontSize: 40, color: 'rgb(56, 167, 241)'}}>
+            <Text style={{ fontSize: 40, color: 'rgb(56, 167, 241)' }}>
               Loading...
             </Text>
           </View>
@@ -363,10 +363,12 @@ let App = () => {
               <FlatList
                 numColumns={2}
                 data={rfItem}
-                renderItem={({item}) => (
+                renderItem={({ item }) => (
                   <Pressable
                     onPress={() => {
                       if (isConnect) {
+                        setName(String(item['name']))
+                        setAmount(String(item['Amount']))
                         setUpdateRfItem(item);
                         setOpenUpdate(true);
                       }
@@ -404,11 +406,14 @@ let App = () => {
               }>
               <FlatList
                 data={wantItem}
-                renderItem={({item}) => {
+                renderItem={({ item }) => {
                   return (
                     <Pressable
                       onPress={() => {
                         if (isConnect) {
+                          setName(String(item['name']))
+                          setAmount(String(item['Amount']))
+                          setComment(String(item['Comment']))
                           setUpdateWantItem(item);
                           setOpenUpdate(true);
                         }
@@ -510,7 +515,7 @@ let App = () => {
               alignItems: 'center',
               padding: '5%',
             }}>
-            <Text style={{color: 'rgb(66, 165, 245)', fontSize: 25}}>
+            <Text style={{ color: 'rgb(66, 165, 245)', fontSize: 25 }}>
               {index == indexList[1] ? 'เพิ่มรายการ' : 'เพิ่มในตู้เย็น'}
             </Text>
             <View
@@ -547,7 +552,7 @@ let App = () => {
                 <></>
               )}
               {canNotSave ? (
-                <Text style={{color: 'red'}}>
+                <Text style={{ color: 'red' }}>
                   * กรอกข้อมูลสิ่งที่ต้องการซื้อและจำนวน
                 </Text>
               ) : (
@@ -576,13 +581,13 @@ let App = () => {
           </View>
 
           <Pressable
-            style={{position: 'absolute', top: '2%', right: 15}}
+            style={{ position: 'absolute', top: '2%', right: 15 }}
             onPress={() => {
               setOpenAdd(false);
               onClose();
               console.log(update);
             }}>
-            <Text style={{color: 'black', fontSize: 20, fontWeight: 'bold'}}>
+            <Text style={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}>
               X
             </Text>
           </Pressable>
@@ -613,7 +618,7 @@ let App = () => {
               padding: '5%',
               justifyContent: 'space-evenly',
             }}>
-            <Text style={{color: 'rgb(66, 165, 245)', fontSize: 25}}>
+            <Text style={{ color: 'rgb(66, 165, 245)', fontSize: 25 }}>
               ต้องการลบหรือไม่
             </Text>
             <Text>
@@ -642,16 +647,20 @@ let App = () => {
               }}></Button>
           </View>
           <Pressable
-            style={{position: 'absolute', top: '2%', right: 15}}
+            style={{ position: 'absolute', top: '2%', right: 15 }}
             onPress={() => {
               setOpenDelete(false);
             }}>
-            <Text style={{color: 'black', fontSize: 20, fontWeight: 'bold'}}>
+            <Text style={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}>
               X
             </Text>
           </Pressable>
         </View>
       </View>
+
+
+
+
       {/* Update Item Page */}
       <View style={openUpdate ? styles.Add : styles.addUnvisible}>
         <View
@@ -675,7 +684,7 @@ let App = () => {
               alignItems: 'center',
               padding: '5%',
             }}>
-            <Text style={{color: 'rgb(66, 165, 245)', fontSize: 25}}>
+            <Text style={{ color: 'rgb(66, 165, 245)', fontSize: 25 }}>
               แก้ไขข้อมูล
             </Text>
             <View
@@ -685,47 +694,29 @@ let App = () => {
                 justifyContent: 'space-around',
                 alignItems: 'center',
               }}>
-              <Text>
-                {index == indexList[1]
-                  ? updateWantItem['name']
-                  : updateRfItem['name']}
-              </Text>
               <TextInput
                 style={styles.textInput}
-                placeholder={
-                  index == indexList[1]
-                    ? 'สิ่งที่ต้องการซ์้อ'
-                    : 'สิ่งที่มีอยู่แล้วในตู้เย็น'
-                }
                 value={name}
                 onChangeText={setName}
+
               />
-              <Text>
-                {index == indexList[1]
-                  ? updateWantItem['Amount']
-                  : updateRfItem['Amount']}
-              </Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="จำนวน"
                 value={amount}
                 onChangeText={setAmount}
               />
               {index == indexList[1] ? (
-                <>
-                  <Text>{updateWantItem['Comment']}</Text>
                   <TextInput
                     style={styles.textInput}
                     placeholder="หมายเหตุ"
                     value={comment}
                     onChangeText={setComment}
                   />
-                </>
               ) : (
                 <></>
               )}
               {canNotSave ? (
-                <Text style={{color: 'red'}}>
+                <Text style={{ color: 'red' }}>
                   * กรอกข้อมูลสิ่งที่ต้องการซื้อและจำนวน
                 </Text>
               ) : (
@@ -758,14 +749,14 @@ let App = () => {
           </View>
 
           <Pressable
-            style={{position: 'absolute', top: '2%', right: 15}}
+            style={{ position: 'absolute', top: '2%', right: 15 }}
             onPress={() => {
               setOpenUpdate(false);
 
               onClose();
               console.log(update);
             }}>
-            <Text style={{color: 'black', fontSize: 20, fontWeight: 'bold'}}>
+            <Text style={{ color: 'black', fontSize: 20, fontWeight: 'bold' }}>
               X
             </Text>
           </Pressable>

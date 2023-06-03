@@ -1,0 +1,4 @@
+#Sat Jun 03 18:06:01 ICT 2023
+base.0=/home/lenilk/code/reactnative/refrigurators/android/app/build/intermediates/dex/release/mergeDexRelease/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

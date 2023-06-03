@@ -1,0 +1,92 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.refrigurators"
+4    android:versionCode="2"
+5    android:versionName="1.11" >
+6
+7    <uses-sdk
+7-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:5:5-6:38
+8        android:minSdkVersion="21"
+8-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:6:9-35
+9        android:targetSdkVersion="33" />
+9-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:5:5-6:38
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:3:5-67
+11-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:3:22-64
+12    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+12-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:4:5-77
+12-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:4:22-75
+13    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+13-->[:react-native-community_netinfo] /home/lenilk/code/reactnative/refrigurators/node_modules/@react-native-community/netinfo/android/build/intermediates/merged_manifest/release/AndroidManifest.xml:9:5-79
+13-->[:react-native-community_netinfo] /home/lenilk/code/reactnative/refrigurators/node_modules/@react-native-community/netinfo/android/build/intermediates/merged_manifest/release/AndroidManifest.xml:9:22-76
+14    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+14-->[:react-native-community_netinfo] /home/lenilk/code/reactnative/refrigurators/node_modules/@react-native-community/netinfo/android/build/intermediates/merged_manifest/release/AndroidManifest.xml:10:5-76
+14-->[:react-native-community_netinfo] /home/lenilk/code/reactnative/refrigurators/node_modules/@react-native-community/netinfo/android/build/intermediates/merged_manifest/release/AndroidManifest.xml:10:22-73
+15
+16    <application
+16-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:7:5-26:19
+17        android:name="com.refrigurators.MainApplication"
+17-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:9:7-38
+18        android:allowBackup="false"
+18-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:12:7-34
+19        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+19-->[androidx.core:core:1.7.0] /home/lenilk/.gradle/caches/transforms-3/08e1174eef2c209ea18090f1084adbcb/transformed/core-1.7.0/AndroidManifest.xml:24:18-86
+20        android:icon="@mipmap/ic_launcher"
+20-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:11:7-41
+21        android:label="@string/app_name"
+21-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:10:7-39
+22        android:theme="@style/AppTheme"
+22-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:13:7-38
+23        android:usesCleartextTraffic="true" >
+23-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:8:7-42
+24        <activity
+24-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:14:7-25:18
+25            android:name="com.refrigurators.MainActivity"
+25-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:15:9-37
+26            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+26-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:17:9-118
+27            android:exported="true"
+27-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:20:9-32
+28            android:label="@string/app_name"
+28-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:16:9-41
+29            android:launchMode="singleTask"
+29-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:18:9-40
+30            android:windowSoftInputMode="adjustResize" >
+30-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:19:9-51
+31            <intent-filter>
+31-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:21:9-24:25
+32                <action android:name="android.intent.action.MAIN" />
+32-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:22:13-65
+32-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:22:21-62
+33
+34                <category android:name="android.intent.category.LAUNCHER" />
+34-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:23:13-73
+34-->/home/lenilk/code/reactnative/refrigurators/android/app/src/main/AndroidManifest.xml:23:23-70
+35            </intent-filter>
+36        </activity>
+37
+38        <provider
+38-->[androidx.emoji2:emoji2:1.0.0] /home/lenilk/.gradle/caches/transforms-3/30102b16e64b2b966e993f978f0d77f3/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:26:9-34:20
+39            android:name="androidx.startup.InitializationProvider"
+39-->[androidx.emoji2:emoji2:1.0.0] /home/lenilk/.gradle/caches/transforms-3/30102b16e64b2b966e993f978f0d77f3/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:27:13-67
+40            android:authorities="com.refrigurators.androidx-startup"
+40-->[androidx.emoji2:emoji2:1.0.0] /home/lenilk/.gradle/caches/transforms-3/30102b16e64b2b966e993f978f0d77f3/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:28:13-68
+41            android:exported="false" >
+41-->[androidx.emoji2:emoji2:1.0.0] /home/lenilk/.gradle/caches/transforms-3/30102b16e64b2b966e993f978f0d77f3/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:29:13-37
+42            <meta-data
+42-->[androidx.emoji2:emoji2:1.0.0] /home/lenilk/.gradle/caches/transforms-3/30102b16e64b2b966e993f978f0d77f3/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:31:13-33:52
+43                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+43-->[androidx.emoji2:emoji2:1.0.0] /home/lenilk/.gradle/caches/transforms-3/30102b16e64b2b966e993f978f0d77f3/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:32:17-75
+44                android:value="androidx.startup" />
+44-->[androidx.emoji2:emoji2:1.0.0] /home/lenilk/.gradle/caches/transforms-3/30102b16e64b2b966e993f978f0d77f3/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:33:17-49
+45            <meta-data
+45-->[androidx.lifecycle:lifecycle-process:2.4.0] /home/lenilk/.gradle/caches/transforms-3/168829b299da31b5f39d19c1353bb79f/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:31:13-33:52
+46                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+46-->[androidx.lifecycle:lifecycle-process:2.4.0] /home/lenilk/.gradle/caches/transforms-3/168829b299da31b5f39d19c1353bb79f/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:32:17-78
+47                android:value="androidx.startup" />
+47-->[androidx.lifecycle:lifecycle-process:2.4.0] /home/lenilk/.gradle/caches/transforms-3/168829b299da31b5f39d19c1353bb79f/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:33:17-49
+48        </provider>
+49    </application>
+50
+51</manifest>
